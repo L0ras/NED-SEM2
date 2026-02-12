@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>NED - Opdracht SEM2</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #4e73df, #1cc88a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 600px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+h1 { margin-bottom: 5px; }
+
+.subtitle {
+    font-size: 14px;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.question {
+    font-size: 18px;
+    margin: 20px 0;
+}
+
+input {
+    padding: 10px;
+    width: 80%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+button {
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.checkBtn {
+    padding: 12px 25px;
+    font-size: 18px;
+    background: #4e73df;
+    color: white;
+}
+
+.checkBtn:hover { background: #2e59d9; }
+
+.helpBtn {
+    padding: 8px 15px;
+    font-size: 14px;
+    background: #858796;
+    color: white;
+}
+
+.helpBtn:hover { background: #6c757d; }
+
+.feedback {
+    margin-top: 15px;
+    font-weight: bold;
+    min-height: 24px;
+}
+
+.score { margin-top: 10px; }
+
+.wordlist {
+    margin-top: 15px;
+    display: none;
+    text-align: left;
+    background: #f8f9fc;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="gameContainer">
+    <h1>NED - Opdracht SEM2</h1>
+    <div class="subtitle">Wie ben ik? 🤔 – Raad het academische woord</div>
+
+    <div class="question" id="question"></div>
+    <input type="text" id="answer" placeholder="Typ hier je antwoord">
+    <br>
+    <button class="checkBtn" onclick="checkAnswer()">Controleer</button>
+    <br>
+    <button class="helpBtn" id="helpButton" onclick="toggleWordList()">
+        de lijst van woorden weergeven (hulpmiddel)
+    </button>
+
+    <div class="wordlist" id="wordlist">
+        <strong>Woordenlijst:</strong>
+        <ul>
+            <li>alternatief</li>
+            <li>analogie</li>
+            <li>analyse</li>
+            <li>arbitrair</li>
+            <li>argument</li>
+            <li>associatie</li>
+            <li>autonoom</li>
+            <li>cognitie</li>
+            <li>compensatie</li>
+            <li>competent</li>
+            <li>component</li>
+            <li>concluderen</li>
+            <li>controverse</li>
+            <li>consensus</li>
+            <li>conservatief</li>
+            <li>context</li>
+            <li>correlatie</li>
+        </ul>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    <div class="score" id="score"></div>
+</div>
+
+<script>
+
+let questions = [
+{ clue: "Een andere mogelijkheid of keuze.", answer: "alternatief" },
+{ clue: "Een vergelijking om iets duidelijk te maken.", answer: "analogie" },
+{ clue: "Een grondig onderzoek van iets.", answer: "analyse" },
+{ clue: "Op basis van willekeur, zonder vaste reden.", answer: "arbitrair" },
+{ clue: "Een reden of bewijs om iets te ondersteunen.", answer: "argument" },
+{ clue: "Een verband dat je in gedachten legt tussen dingen.", answer: "associatie" },
+{ clue: "Zelfstandig kunnen handelen.", answer: "autonoom" },
+{ clue: "Het proces van denken en begrijpen.", answer: "cognitie" },
+{ clue: "Iets dat een nadeel goedmaakt.", answer: "compensatie" },
+{ clue: "Bekwaam of geschikt om iets te doen.", answer: "competent" },
+{ clue: "Een onderdeel van een groter geheel.", answer: "component" },
+{ clue: "Een besluit trekken uit informatie.", answer: "concluderen" },
+{ clue: "Een onderwerp waar veel discussie over is.", answer: "controverse" },
+{ clue: "Algemene overeenstemming.", answer: "consensus" },
+{ clue: "Behoudend, niet snel voor verandering.", answer: "conservatief" },
+{ clue: "De situatie of omgeving waarin iets gebeurt.", answer: "context" },
+{ clue: "Een samenhang tussen twee dingen.", answer: "correlatie" }
+];
+
+// Shuffle vragen
+questions.sort(() => Math.random() - 0.5);
+
+let currentQuestion = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let attempts = 0;
+
+function loadQuestion() {
+    document.getElementById("question").innerText =
+        questions[currentQuestion].clue;
+    document.getElementById("answer").value = "";
+    document.getElementById("feedback").innerText = "";
+    attempts = 0;
+}
+
+function checkAnswer() {
+    const userAnswer = document.getElementById("answer").value.toLowerCase().trim();
+    const correctAnswer = questions[currentQuestion].answer;
+
+    if (userAnswer === correctAnswer) {
+        correctCount++;
+        document.getElementById("feedback").innerText = "✅ Correct!";
+        document.getElementById("feedback").style.color = "green";
+        nextQuestion();
+    } else {
+        attempts++;
+        wrongCount++;
+
+        if (attempts < 3) {
+            document.getElementById("feedback").innerText =
+                "❌ Fout! Poging " + attempts + " van 3.";
+            document.getElementById("feedback").style.color = "red";
+        } else {
+            document.getElementById("feedback").innerText =
+                "❌ 3 keer fout. Het juiste antwoord was: " + correctAnswer;
+            document.getElementById("feedback").style.color = "darkred";
+            nextQuestion();
+        }
+    }
+
+    updateScore();
+}
+
+function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        setTimeout(loadQuestion, 1500);
+    } else {
+        showFinalScore();
+    }
+}
+
+function updateScore() {
+    document.getElementById("score").innerText =
+        "Juist: " + correctCount +
+        " | Fouten: " + wrongCount;
+}
+
+function showFinalScore() {
+    const percentage = Math.round((correctCount / questions.length) * 100);
+    let beoordeling = "";
+
+    if (percentage >= 90) beoordeling = "🏆 Uitstekend!";
+    else if (percentage >= 70) beoordeling = "👍 Goed gedaan!";
+    else if (percentage >= 50) beoordeling = "🙂 Voldoende.";
+    else beoordeling = "📚 Nog wat oefenen!";
+
+    document.getElementById("gameContainer").innerHTML =
+        "<h1>NED - Opdracht SEM2</h1>" +
+        "<h2>Spel afgelopen 🎉</h2>" +
+        "<p><strong>Score:</strong> " + correctCount + " / 17</p>" +
+        "<p><strong>Percentage:</strong> " + percentage + "%</p>" +
+        "<p>" + beoordeling + "</p>" +
+        "<button onclick='location.reload()'>Opnieuw spelen</button>";
+}
+
+// ENTER toets
+document.getElementById("answer").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        checkAnswer();
+    }
+});
+
+function toggleWordList() {
+    const list = document.getElementById("wordlist");
+    const button = document.getElementById("helpButton");
+
+    if (list.style.display === "none") {
+        list.style.display = "block";
+        button.innerText = "lijst verstoppen";
+    } else {
+        list.style.display = "none";
+        button.innerText = "de lijst van woorden weergeven (hulpmiddel)";
+    }
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
+
